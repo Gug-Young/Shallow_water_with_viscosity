@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#unknown file
+desktop.ini
+**/desktop.ini
