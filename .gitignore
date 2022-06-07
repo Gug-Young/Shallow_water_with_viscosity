@@ -139,3 +139,4 @@ clawpack-v5.4.0rc-alpha
 *.gz
 shallow_water
 참조 논문
+VOF method
