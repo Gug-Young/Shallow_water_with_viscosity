@@ -126,7 +126,7 @@ x = np.linspace(0,L_x,N_x)
 def sim_max_u_x(cSt,N_t,Draw = False):
     h = np.ones(N_x)*2
     slope = lambda x,b,L,c: ((x>=b)&(x<c))*(x-b)*(L/(L_x-b-(L_x-c))) + L*(x>=c)
-
+    
     u = np.zeros(N_x)
     z = np.ones(N_x)*0
     s = slope(x,20,2,70)
@@ -135,6 +135,8 @@ def sim_max_u_x(cSt,N_t,Draw = False):
 
     hs = 2.4
     h = np.where(h>=z,h-z+err,0)
+    maxh = np.max(h)
+    kappa = maxh/L_x *20
     dt = 0.001
     h_list = []
     u_list = []
@@ -145,12 +147,13 @@ def sim_max_u_x(cSt,N_t,Draw = False):
     for i in range(N_t):
         hn = h.copy()
         un = u.copy()
-        h_list.append(h)
-        u_list.append(u)
-        t_list.append(t)
-        hs_list.append(hs)
+        if i%20==0:
+            h_list.append(h)
+            u_list.append(u)
+            t_list.append(t)
+            hs_list.append(hs)
         t +=dt
-        h,u,dt,hs =shallow_water_viscous_sorce(hn,un,z,dx,dt,0.3,mu=mu,hs=hs)
+        h,u,dt,hs =shallow_water_viscous_sorce(hn,un,z,dx,dt,kappa,mu=mu,hs=hs)
     max_ux = np.max(u_list,axis=0)
     max_uxind = np.argmax(max_ux)
     max_x = x[max_uxind]
@@ -162,4 +165,4 @@ def sim_max_u_x(cSt,N_t,Draw = False):
         plt.plot(z)
         plt.plot(u)
         
-    return max_ux[2:-2],max_x,max_t, t_list[-1]
+    return max_ux[2:-2],max_x,max_t,t_list[-1], t_list, u_list,h_list

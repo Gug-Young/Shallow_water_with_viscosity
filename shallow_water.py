@@ -128,7 +128,7 @@ def set_u_h():
     h[:int(200//dx)]= h_
     slope = lambda x,b,L: (x>=b)*(x-b)*(L/(L_x-b))
     dam  = lambda x,a,b,L: ((x>=a)&(x<=b))*L
-
+    maxh = max(h)
     u = np.zeros(N_x)
     z = np.ones(N_x)*1
     s = slope(x,0,1.5)
@@ -139,7 +139,7 @@ def set_u_h():
     z_ = np.zeros(N_x)
 
     h = np.where(h>=z,h-z,0)
-    return u,h,z
+    return u,h,z,maxh
     
 def set_figure(cSt):
     h = np.ones(N_x)*0.5
@@ -177,7 +177,7 @@ def set_figure(cSt):
 
 
 def Shallow_water_check(cSt, N_t,check_time,Draw= False):
-    u,h,z= set_u_h()
+    u,h,z,maxh= set_u_h()
     h_list = []
     u_list = []
     t_list = []
@@ -185,15 +185,16 @@ def Shallow_water_check(cSt, N_t,check_time,Draw= False):
     t = 0
     # cSt = 1.0034
     mu = 1e-6 * cSt 
-    kappa = 0.3 #논문에서 h/L 의 10배정도가 Nonslip boundry에 근접했음, 그래서 20배를 해줘서 Non slip boundary 보장
+    kappa = maxh/L_x * 20 #논문에서 h/L 의 10배정도가 Nonslip boundry에 근접했음, 그래서 20배를 해줘서 Non slip boundary 보장
     # h,u,dt =shallow_water_viscous(u,h,z,dx,dt,0.01,0.1)
     count = 0
     for i in range(N_t):
         hn = h.copy()
         un = u.copy()
-        h_list.append(h)
-        u_list.append(u)
-        t_list.append(t)
+        if i%40==0:
+            h_list.append(h)
+            u_list.append(u)
+            t_list.append(t)
         t +=dt
         h,u,dt =shallow_water_viscous(hn,un,z,dx,dt,kappa=kappa,mu=mu,c_num=0.7,g = 9.81)
         # if (t >= check_time) & count == 0:
